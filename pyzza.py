@@ -91,7 +91,7 @@ def cargar_producto():
         )
 
 
-# listar_productos genera una lista formateada de un producto y sus características
+# listar_productos genera una lista formateada de todos los productos y sus características
 def listar_productos():
     # tomar datos en la db
     db.execute('SELECT nombre, precio, cantidad, moneda FROM productos')
@@ -112,7 +112,7 @@ def listar_productos():
         print("No hay productos")
 
 
-# promedio_precios devuelve el promedio de los precios de todos los productos
+# promedio_precios devuelve un string de los promedios de los precios de todos los productos
 def promedio_precios():
     # tomar datos en la db
     db.execute('SELECT nombre, precio FROM productos')
@@ -120,11 +120,12 @@ def promedio_precios():
 
     # checkeo si la lista está vacía
     if lista == ():
-        print("No hay productos para calcular el promedio")
+        return "No hay productos para calcular el promedio"
     else:
         prom = promedio(lista)
-        print("El precio promedio de los productos es: $" +
-              str(round(prom, 2)))
+        salida = ("El precio promedio de los productos es: $" +
+                  str(round(prom, 2)))
+        return salida
 
 
 # producto_mas_caro devuelve el mas caro de todos los productos
@@ -135,8 +136,9 @@ def producto_mas_caro():
 
     # calculo el máximo de la lista
     mas_caro = maximo(productos)
-    print("El producto más caro es " + str(mas_caro[0]) +
-          " con un precio de $" + str(mas_caro[1]) + " en " + mas_caro[3])
+    salida = ("El producto más caro es " + str(mas_caro[0]) +
+              " con un precio de $" + str(mas_caro[1]) + " en " + mas_caro[3])
+    return salida
 
 
 # producto_mas_caro devuelve el mas barato de todos los productos
@@ -147,8 +149,10 @@ def producto_mas_barato():
 
     # calculo el minimo de la lista
     mas_barato = minimo(productos)
-    print("El producto más barato es " + str(mas_barato[0]) +
-          " con un precio de $" + str(mas_barato[1]) + " en " + mas_barato[3])
+    salida = ("El producto más barato es " + str(mas_barato[0]) +
+              " con un precio de $" + str(mas_barato[1]) + " en " +
+              mas_barato[3])
+    return salida
 
 
 # info_sobre_producto devuelve la información sobre un producto de manera formateada
@@ -156,6 +160,7 @@ def info_sobre_producto(info):
     # tomar datos en la db
     db.execute('SELECT nombre, precio, cantidad, moneda FROM productos')
     productos = db.fetchall()
+    salida = []
 
     # el contador se utiliza para comprobar si se encontró un producto
     contador = 0
@@ -165,17 +170,14 @@ def info_sobre_producto(info):
         # itero cada característica
         for i in range(len(prod)):
             # si la característica es igual a lo ingresado, se devuelve la información sobre ese producto
-            if prod[i] == info.lower():
+            if str(prod[i]) == info.lower():
+                salida.append(prod)
                 contador += 1
-                print("|------------------------------")
-                print("| Nombre: " + str(prod[0]))
-                print("| Precio: $" + str(prod[1]))
-                print("| Cantidad: $" + str(prod[2]))
-                print("| Moneda: " + str(prod[3]))
-                print("|------------------------------")
 
     if contador == 0:
-        print("No se encontró el producto :/")
+        return "No se encontró el producto :/"
+
+    return salida
 
 
 # genera el prompt para volver a mostrar el menú
@@ -206,17 +208,27 @@ def menu():
             listar_productos()
             esperar_input()
         elif opcion == 'c':
-            info = str(input("Ingrese el producto a buscar: "))
-            info_sobre_producto(info)
+            info = str(input("Ingrese la característica a buscar: "))
+
+            lista = info_sobre_producto(info)
+
+            # itero cada producto encontrado
+            for i in lista:
+                print("|------------------------------")
+                print("| Nombre: " + str(i[0]))
+                print("| Precio: $" + str(i[1]))
+                print("| Cantidad: $" + str(i[2]))
+                print("| Moneda: " + str(i[3]))
+                print("|------------------------------")
             esperar_input()
         elif opcion == 'd':
-            promedio_precios()
+            print(promedio_precios())
             esperar_input()
         elif opcion == 'e':
-            producto_mas_caro()
+            print(producto_mas_caro())
             esperar_input()
         elif opcion == 'f':
-            producto_mas_barato()
+            print(producto_mas_barato())
             esperar_input()
         elif opcion == 'g':
             print("¡Gracias por usar el sistema del comercio! ¡Hasta luego!")
