@@ -75,7 +75,7 @@ def cargar_producto():
         cantidad = int(input("Ingrese la cantidad de " + nombre + ": "))
         moneda = input("Ingrese la criptomoneda con la que pagar " + nombre +
                        ": ")
-    
+
         # insertar datos en la db
         db.execute(
             'INSERT INTO productos (nombre, precio, cantidad, moneda) VALUES (?, ?, ?, ?)',
@@ -97,7 +97,7 @@ def listar_productos():
     db.execute('SELECT nombre, precio, cantidad, moneda FROM productos')
     productos = db.fetchall()
 
-    # verifico si hay productos 
+    # verifico si hay productos
     if productos:
         print("-=============================-")
         print("|Listado de productos")
@@ -137,6 +137,7 @@ def producto_mas_caro():
     mas_caro = maximo(productos)
     print("El producto más caro es " + str(mas_caro[0]) +
           " con un precio de $" + str(mas_caro[1]) + " en " + mas_caro[3])
+
 
 # producto_mas_caro devuelve el mas barato de todos los productos
 def producto_mas_barato():
@@ -181,6 +182,7 @@ def info_sobre_producto(info):
 def esperar_input():
     input("\nPresione Enter para continuar...")
     print("\n")
+
 
 # inicializo el menú
 def menu():
