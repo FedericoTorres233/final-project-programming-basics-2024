@@ -16,9 +16,9 @@ logo = """
         |___/         
 """
 
-# crear la tabla de productos si no existe
+# crear la tabla de pizzas si no existe
 db.execute('''
-CREATE TABLE IF NOT EXISTS productos (
+CREATE TABLE IF NOT EXISTS pizzas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL,
     precio REAL NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS productos (
 conn.commit()
 
 
-# promedio hace el toma una lista de productos y retorna el promedio (prod[1] es el precio)
+# promedio hace el toma una lista de pizzas y retorna el promedio (prod[1] es el precio)
 def promedio(lista):
     suma = 0
     for prod in lista:
@@ -37,14 +37,14 @@ def promedio(lista):
     return suma / len(lista)
 
 
-# maximo calcula el producto de maximo precio de una lista de productos
-def maximo(productos):
+# maximo calcula la pizza de maximo precio de una lista de pizzas
+def maximo(pizzas):
     # inicializar el mayor como el menor valor posible
     precio_mayor = 0
     mayor = ["", 0]
 
     # recorrer la lista y actualizar el valor del mayor si encontramos un valor mayor (elemento[1] es el precio)
-    for elemento in productos:
+    for elemento in pizzas:
         if elemento[1] > precio_mayor:
             mayor = elemento
             precio_mayor = elemento[1]
@@ -52,14 +52,14 @@ def maximo(productos):
     return mayor
 
 
-# minimo calcula el producto de maximo precio de una lista de productos
-def minimo(productos):
+# minimo calcula la pizzas de maximo precio de una lista de pizzas
+def minimo(pizzas):
     # inicializar el menor como el mayor valor posible
     precio_menor = 9999999999999999999
     menor = ["", 0]
 
     # recorrer la lista y actualizar el valor del menor si encontramos un valor menor (elemento[1] es el precio)
-    for elemento in productos:
+    for elemento in pizzas:
         if elemento[1] < precio_menor:
             menor = elemento
             precio_menor = elemento[1]
@@ -67,9 +67,9 @@ def minimo(productos):
     return menor
 
 
-# cargar_producto pide el ingreso de productos y sus características hasta que nombre sea vacío
-def cargar_producto():
-    nombre = input("Ingrese el nombre del producto: ")
+# cargar_pizzas pide el ingreso de pizzas y sus características hasta que nombre sea vacío
+def cargar_pizzas():
+    nombre = input("Ingrese el nombre de la pizza: ")
     while nombre != "":
         precio = float(input("Ingrese el precio de " + nombre + ": "))
         cantidad = int(input("Ingrese la cantidad de " + nombre + ": "))
@@ -78,106 +78,104 @@ def cargar_producto():
 
         # insertar datos en la db
         db.execute(
-            'INSERT INTO productos (nombre, precio, cantidad, moneda) VALUES (?, ?, ?, ?)',
+            'INSERT INTO pizzas (nombre, precio, cantidad, moneda) VALUES (?, ?, ?, ?)',
             (nombre.lower(), precio, cantidad, moneda))
         conn.commit()
 
         # mostrar datos cargados
-        print("Producto " + nombre + " cuyo precio es $" + str(precio) + " x" +
+        print("Pizza " + nombre + " cuyo precio es $" + str(precio) + " x" +
               str(cantidad) + ", y que se compra con " + str(moneda) +
               ", se ha cargado exitosamente")
+        print("\n[No ingresar nada si quiere terminar la carga]")
         nombre = input(
-            "Ingrese el nombre del producto:\n(No ingresar nada para terminar la carga) "
+            "Ingrese el nombre de la pizza: "
         )
 
 
-# listar_productos genera una lista formateada de todos los productos y sus características
-def listar_productos():
+# listar_pizzas genera una lista formateada de todos los pizzas y sus características
+def listar_pizzas():
     # tomar datos en la db
-    db.execute('SELECT nombre, precio, cantidad, moneda FROM productos')
-    productos = db.fetchall()
+    db.execute('SELECT nombre, precio, cantidad, moneda FROM pizzas')
+    pizzas = db.fetchall()
 
-    # verifico si hay productos
-    if productos:
+    # verifico si hay pizzas
+    if pizzas:
         print("-=============================-")
-        print("|Listado de productos")
-        for producto in productos:
+        print("| Listado de pizzas")
+        for pizza in pizzas:
             print("|------------------------------")
-            print("| Nombre: " + str(producto[0]))
-            print("| Precio: $" + str(producto[1]))
-            print("| Cantidad: $" + str(producto[2]))
-            print("| Moneda: " + str(producto[3]))
+            print("| Nombre: " + str(pizza[0]))
+            print("| Precio: $" + str(pizza[1]))
+            print("| Cantidad: $" + str(pizza[2]))
+            print("| Moneda: " + str(pizza[3]))
         print("-=============================-")
     else:
-        print("No hay productos")
+        print("No hay pizzas cargadas")
 
 
-# promedio_precios devuelve un string de los promedios de los precios de todos los productos
+# promedio_precios devuelve un string de los promedios de los precios de todos las pizzas
 def promedio_precios():
     # tomar datos en la db
-    db.execute('SELECT nombre, precio FROM productos')
+    db.execute('SELECT nombre, precio FROM pizzas')
     lista = db.fetchall()
 
     # checkeo si la lista está vacía
     if lista == ():
-        return "No hay productos para calcular el promedio"
+        return "No hay pizzas para calcular el promedio"
     else:
         prom = promedio(lista)
-        salida = ("El precio promedio de los productos es: $" +
+        salida = ("El precio promedio de las pizzas es: $" +
                   str(round(prom, 2)))
         return salida
 
 
-# producto_mas_caro devuelve el mas caro de todos los productos
-def producto_mas_caro():
+# pizza_mas_cara devuelve el mas caro de todas las pizzas
+def pizza_mas_cara():
     # tomar datos en la db
-    db.execute('SELECT nombre, precio, cantidad, moneda FROM productos')
-    productos = db.fetchall()
+    db.execute('SELECT nombre, precio, cantidad, moneda FROM pizzas')
+    pizzas = db.fetchall()
 
     # calculo el máximo de la lista
-    mas_caro = maximo(productos)
-    salida = ("El producto más caro es " + str(mas_caro[0]) +
+    mas_caro = maximo(pizzas)
+    salida = ("La pizza más cara es " + str(mas_caro[0]) +
               " con un precio de $" + str(mas_caro[1]) + " en " + mas_caro[3])
     return salida
 
 
-# producto_mas_caro devuelve el mas barato de todos los productos
-def producto_mas_barato():
+# pizza_mas_barata devuelve el mas barato de todas las pizzas
+def pizza_mas_barata():
     # tomar datos en la db
-    db.execute('SELECT nombre, precio, cantidad, moneda FROM productos')
-    productos = db.fetchall()
+    db.execute('SELECT nombre, precio, cantidad, moneda FROM pizzas')
+    pizzas = db.fetchall()
 
     # calculo el minimo de la lista
-    mas_barato = minimo(productos)
-    salida = ("El producto más barato es " + str(mas_barato[0]) +
+    mas_barato = minimo(pizzas)
+    salida = ("La pizza más barata es " + str(mas_barato[0]) +
               " con un precio de $" + str(mas_barato[1]) + " en " +
               mas_barato[3])
     return salida
 
 
-# info_sobre_producto devuelve la información sobre un producto de manera formateada
-def info_sobre_producto(info):
+# info_sobre_pizza devuelve la información sobre una pizza de manera formateada
+def info_sobre_pizza(info):
     # tomar datos en la db
-    db.execute('SELECT nombre, precio, cantidad, moneda FROM productos')
-    productos = db.fetchall()
+    db.execute('SELECT nombre, precio, cantidad, moneda FROM pizzas')
+    pizzas = db.fetchall()
     salida = []
 
-    # el contador se utiliza para comprobar si se encontró un producto
+    # cuento la cantidad de pizzas encontradas
     contador = 0
 
-    # itero productos
-    for prod in productos:
+    # itero pizzas
+    for pizza in pizzas:
         # itero cada característica
-        for i in range(len(prod)):
-            # si la característica es igual a lo ingresado, se devuelve la información sobre ese producto
-            if str(prod[i]) == info.lower():
-                salida.append(prod)
+        for i in range(len(pizza)):
+            # si la característica es igual a lo ingresado, se devuelve la información sobre esa pizza
+            if str(pizza[i]).lower() == info.lower():
+                salida.append(pizza)
                 contador += 1
 
-    if contador == 0:
-        return "No se encontró el producto :/"
-
-    return salida
+    return salida, contador
 
 
 # genera el prompt para volver a mostrar el menú
@@ -192,43 +190,47 @@ def menu():
     while opcion != "g":
         print(logo)
         print("¡Bienvenido a la pizzería Pyzza!")
-        print("\ta) Cargar producto")
-        print("\tb) Listar productos")
-        print("\tc) Mostrar información sobre un producto")
+        print("\ta) Cargar pizza")
+        print("\tb) Listar pizzas")
+        print("\tc) Mostrar información sobre una pizza")
         print("\td) Calcular precio promedio")
-        print("\te) Producto más caro")
-        print("\tf) Producto más barato")
+        print("\te) Pizza más cara")
+        print("\tf) Pizza más barata")
         print("\tg) Salir")
 
         # analisis de opciones ingresadas
-        opcion = input("Seleccione una opción: ")
+        opcion = input("\nSeleccione una opción: ").lower()
         if opcion == 'a':
-            cargar_producto()
+            cargar_pizzas()
         elif opcion == 'b':
-            listar_productos()
+            listar_pizzas()
             esperar_input()
         elif opcion == 'c':
             info = str(input("Ingrese la característica a buscar: "))
 
-            lista = info_sobre_producto(info)
-
-            # itero cada producto encontrado
-            for i in lista:
-                print("|------------------------------")
-                print("| Nombre: " + str(i[0]))
-                print("| Precio: $" + str(i[1]))
-                print("| Cantidad: $" + str(i[2]))
-                print("| Moneda: " + str(i[3]))
-                print("|------------------------------")
+            lista, contador = info_sobre_pizza(info)
+            # compruebo si la lista esta vacía
+            if (lista == "") or (contador == 0):
+                print("\tNo se encontró una pizza con esa característica")
+            else:
+                # itero cada pizza encontrada
+                for i in lista:
+                    print("|------------------------------")
+                    print("| Nombre: " + str(i[0]))
+                    print("| Precio: $" + str(i[1]))
+                    print("| Cantidad: $" + str(i[2]))
+                    print("| Moneda: " + str(i[3]))
+                    print("|------------------------------")
+                print("\n¡Se han encontrado " + str(contador) + " pizza(s)!")
             esperar_input()
         elif opcion == 'd':
             print(promedio_precios())
             esperar_input()
         elif opcion == 'e':
-            print(producto_mas_caro())
+            print(pizza_mas_cara())
             esperar_input()
         elif opcion == 'f':
-            print(producto_mas_barato())
+            print(pizza_mas_barata())
             esperar_input()
         elif opcion == 'g':
             print("¡Gracias por usar el sistema del comercio! ¡Hasta luego!")
