@@ -87,9 +87,7 @@ def cargar_pizzas():
               str(cantidad) + ", y que se compra con " + str(moneda) +
               ", se ha cargado exitosamente")
         print("\n[No ingresar nada si quiere terminar la carga]")
-        nombre = input(
-            "Ingrese el nombre de la pizza: "
-        )
+        nombre = input("Ingrese el nombre de la pizza: ")
 
 
 # listar_pizzas genera una lista formateada de todos los pizzas y sus características
@@ -178,6 +176,19 @@ def info_sobre_pizza(info):
     return salida, contador
 
 
+# eliminar_pizza elimina la pizza ingresa y devuelve si la pizza se pudo borrar
+def eliminar_pizza(pizza):
+    # borrar datos de la db
+    db.execute('DELETE FROM pizzas WHERE nombre = ?', (pizza.lower(), ))
+    conn.commit()
+
+    # guardo la cantidad de pizzas eliminadas
+    pizzas_eliminadas = db.rowcount
+
+    # devuelvo un bool
+    return pizzas_eliminadas != 0
+
+
 # genera el prompt para volver a mostrar el menú
 def esperar_input():
     input("\nPresione Enter para continuar...")
@@ -187,16 +198,17 @@ def esperar_input():
 # inicializo el menú
 def menu():
     opcion = ""
-    while opcion != "g":
+    while opcion != "h":
         print(logo)
         print("¡Bienvenido a la pizzería Pyzza!")
         print("\ta) Cargar pizza")
         print("\tb) Listar pizzas")
         print("\tc) Mostrar información sobre una pizza")
-        print("\td) Calcular precio promedio")
-        print("\te) Pizza más cara")
-        print("\tf) Pizza más barata")
-        print("\tg) Salir")
+        print("\td) Eliminar una pizza")
+        print("\te) Calcular precio promedio")
+        print("\tf) Pizza más cara")
+        print("\tg) Pizza más barata")
+        print("\th) Salir")
 
         # analisis de opciones ingresadas
         opcion = input("\nSeleccione una opción: ").lower()
@@ -224,15 +236,23 @@ def menu():
                 print("\n¡Se han encontrado " + str(contador) + " pizza(s)!")
             esperar_input()
         elif opcion == 'd':
-            print(promedio_precios())
+            pizza_a_borrar = str(input("Ingrese la pizza a borrar: "))
+            ok = eliminar_pizza(pizza_a_borrar)
+            if ok:
+                print("\nSe ha eliminado la pizza")
+            else:
+                print("\nNo se pudo eliminar la pizza")
             esperar_input()
         elif opcion == 'e':
-            print(pizza_mas_cara())
+            print(promedio_precios())
             esperar_input()
         elif opcion == 'f':
-            print(pizza_mas_barata())
+            print(pizza_mas_cara())
             esperar_input()
         elif opcion == 'g':
+            print(pizza_mas_barata())
+            esperar_input()
+        elif opcion == 'h':
             print("¡Gracias por usar el sistema del comercio! ¡Hasta luego!")
         else:
             print(
